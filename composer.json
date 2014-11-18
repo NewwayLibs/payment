@@ -10,13 +10,12 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "4.2.*",
-        "liqpay/liqpay": "dev-master"
+        "illuminate/support": "4.2.*"
     },
     "autoload": {
         "psr-0": {
             "Newway\\Payment": "src/"
         }
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }

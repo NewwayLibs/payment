@@ -1,6 +1,6 @@
 <?php namespace Newway\Payment\Providers;
 
-use LiqPay as LiqPayProvider;
+use Newway\Vendor\LiqPay as LiqPayProvider;
 use Newway\Payment\Exceptions\HackException;
 use Newway\Payment\Exceptions\ProviderException;
 use Newway\Payment\Validation\ValidationException;
