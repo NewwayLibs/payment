@@ -1,6 +1,5 @@
 <?php namespace Newway\Payment\Providers;
 
-use Newway\Vendor\LiqPay as LiqPayProvider;
 use Newway\Payment\Exceptions\HackException;
 use Newway\Payment\Exceptions\ProviderException;
 use Newway\Payment\Validation\ValidationException;
@@ -9,9 +8,13 @@ use Newway\Payment\Validation\ValidationException;
 class Liqpay extends AbstractProvider
 {
 
-    protected $provider;
-
     protected $data;
+
+    protected $_supportedCurrencies = array('EUR','UAH','USD','RUB','RUR');
+
+    protected $_supportedParams = array('public_key','amount','currency','description',
+                                        'order_id','result_url','server_url','type',
+                                        'signature','language','sandbox');
 
     /**
      * @var array
@@ -36,12 +39,6 @@ class Liqpay extends AbstractProvider
 
         $this->validator->validate($credentials, $rules);
 
-
-        try {
-            $this->provider = new LiqPayProvider($this->credentials['public_key'], $this->credentials['private_key']);
-        } catch (\Exception $e) {
-            throw new ProviderException('Provider init error: ' . $e->getMessage());
-        }
 
     }
 
@@ -73,7 +70,7 @@ class Liqpay extends AbstractProvider
         $this->validator->validate($credentials, $rules);
 
 
-        return $this->provider->cnb_form($credentials);
+        return $this->_getForm($credentials);
     }
 
     /**
@@ -197,6 +194,174 @@ class Liqpay extends AbstractProvider
 
         return array_get($this->data, $field);
     }
+
+
+
+    /**
+     * Call API
+     *
+     * @param string $url
+     * @param array $params
+     *
+     * @return string
+     */
+    public function api($url, $params = array())
+    {
+        $url = 'https://www.liqpay.com/api/'.$url;
+
+        $public_key = $this->credentials['public_key'];
+        $private_key = $this->credentials['private_key'];
+        $data = json_encode(array_merge(compact('public_key'), $params));
+        $signature = base64_encode(sha1($private_key.$data.$private_key, 1));
+        $postfields = "data={$data}&signature={$signature}";
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,$postfields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+
+        $server_output = curl_exec($ch);
+
+        curl_close($ch);
+
+        return json_decode($server_output);
+    }
+
+
+    /**
+     * cnb_form
+     *
+     * @param array $params
+     *
+     * @throws \Exception
+     * @return string
+     */
+    private function _getForm($params)
+    {
+        if (!isset($params['amount'])) {
+            throw new \Exception('Amount is null');
+        }
+        if (!isset($params['currency'])) {
+           throw new \Exception('Currency is null');
+        }
+        if (!in_array($params['currency'], $this->_supportedCurrencies)) {
+            throw new \Exception('Currency is not supported');
+        }
+        if ($params['currency'] == 'RUR') {
+            $params['currency'] = 'RUB';
+        }
+        if (!isset($params['description'])) {
+            throw new \Exception('Description is null');
+        }
+
+        $params['signature'] = $this->_signature($params);
+
+
+        $language = 'ru';
+        if (isset($params['language']) && $params['language'] == 'en') {
+            $language = 'en';
+        }
+
+        $inputs = array();
+        foreach ($params as $key => $value) {
+            if (!in_array($key, $this->_supportedParams)) {
+                continue;
+            }
+            $inputs[] = sprintf('<input type="hidden" name="%s" value="%s" />', $key, $value);
+        }
+
+        return sprintf('
+                <form method="post" action="https://www.liqpay.com/api/pay" accept-charset="utf-8">
+                    %s
+                    <input type="image" src="//static.liqpay.com/buttons/p1%s.radius.png" name="btn_text" />
+                </form>
+            ',
+            join("\r\n", $inputs),
+            $language
+        );
+    }
+
+
+
+
+
+
+
+    /**
+     * _signature
+     *
+     * @param array $params
+     *
+     * @return string
+     */
+    public function _signature($params)
+    {
+        $public_key = $params['public_key'] = $this->credentials['public_key'];
+        $private_key = $this->credentials['private_key'];
+
+
+        if ($params['currency'] == 'RUR') {
+            $params['currency'] = 'RUB';
+        }
+
+        $amount = $params['amount'];
+        $currency = $params['currency'];
+        $description = $params['description'];
+
+        $order_id = '';
+        if (isset($params['order_id'])) {
+           $order_id = $params['order_id'];
+        }
+
+        $type = '';
+        if (isset($params['type'])) {
+           $type = $params['type'];
+        }
+
+        $result_url = '';
+        if (isset($params['result_url'])) {
+           $result_url = $params['result_url'];
+        }
+
+        $server_url = '';
+        if (isset($params['server_url'])) {
+           $server_url = $params['server_url'];
+        }
+
+        $signature = $this->_strToSign(
+            $private_key.
+            $amount.
+            $currency.
+            $public_key.
+            $order_id.
+            $type.
+            $description.
+            $result_url.
+            $server_url
+        );
+
+        return $signature;
+    }
+
+
+    /**
+     * generate signature from string
+     *
+     * @param $str
+     *
+     * @return string
+     */
+    private function _strToSign($str)
+    {
+
+        $signature = base64_encode(sha1($str,1));
+
+        return $signature;
+    }
+
 
 
 }
