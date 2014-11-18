@@ -10,11 +10,21 @@ class Liqpay extends AbstractProvider
 
     protected $data;
 
-    protected $_supportedCurrencies = array('EUR','UAH','USD','RUB','RUR');
+    protected $_supportedCurrencies = array('EUR', 'UAH', 'USD', 'RUB', 'RUR');
 
-    protected $_supportedParams = array('public_key','amount','currency','description',
-                                        'order_id','result_url','server_url','type',
-                                        'signature','language','sandbox');
+    protected $_supportedParams = array(
+            'public_key',
+            'amount',
+            'currency',
+            'description',
+            'order_id',
+            'result_url',
+            'server_url',
+            'type',
+            'signature',
+            'language',
+            'sandbox'
+    );
 
     /**
      * @var array
@@ -83,7 +93,7 @@ class Liqpay extends AbstractProvider
         $this->data['sender_phone'] = array_get($data, 'sender_phone');
         $this->data['transaction_id'] = array_get($data, 'transaction_id');
         $this->data['status'] = array_get($data, 'status');
-        $this->data['order_id'] = intval(array_get($data, 'order_id'));
+        $this->data['order_id'] = array_get($data, 'order_id');
         $this->data['amount'] = array_get($data, 'amount');
         $this->data['currency'] = array_get($data, 'currency');
         $this->data['type'] = array_get($data, 'type');
@@ -112,21 +122,17 @@ class Liqpay extends AbstractProvider
     public function getSign()
     {
 
-        return base64_encode(
-                sha1(
-                        $this->credentials['private_key'] .
-                        $this->amount .
-                        $this->currency .
-                        $this->credentials['public_key'] .
-                        $this->order_id .
-                        $this->type .
-                        $this->description .
-                        $this->status .
-                        $this->transaction_id .
-                        $this->sender_phone
-                        ,
-                        true
-                )
+        return $this->_strToSign(
+                $this->credentials['private_key'] .
+                $this->amount .
+                $this->currency .
+                $this->credentials['public_key'] .
+                $this->order_id .
+                $this->type .
+                $this->description .
+                $this->status .
+                $this->transaction_id .
+                $this->sender_phone
         );
     }
 
@@ -143,7 +149,9 @@ class Liqpay extends AbstractProvider
 
         // проверяем подпись
         if ($sign != $this->signature) {
-            throw new HackException(trans('payments.hack_attempt') . ': ' . trans('payments.invalid_signature'));
+            throw new HackException(
+                    trans('payments.hack_attempt') . ': ' . trans('payments.invalid_signature') . '(' . $sign . ')'
+            );
         }
 
     }
@@ -194,7 +202,6 @@ class Liqpay extends AbstractProvider
     }
 
 
-
     /**
      * Call API
      *
@@ -205,12 +212,13 @@ class Liqpay extends AbstractProvider
      */
     public function api($url, $params = array())
     {
-        $url = 'https://www.liqpay.com/api/'.$url;
+
+        $url = 'https://www.liqpay.com/api/' . $url;
 
         $public_key = $this->credentials['public_key'];
         $private_key = $this->credentials['private_key'];
         $data = json_encode(array_merge(compact('public_key'), $params));
-        $signature = base64_encode(sha1($private_key.$data.$private_key, 1));
+        $signature = base64_encode(sha1($private_key . $data . $private_key, 1));
         $postfields = "data={$data}&signature={$signature}";
 
         $ch = curl_init();
@@ -218,8 +226,8 @@ class Liqpay extends AbstractProvider
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,$postfields);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         $server_output = curl_exec($ch);
 
@@ -247,7 +255,7 @@ class Liqpay extends AbstractProvider
             throw new \Exception('Amount is null');
         }
         if (!isset($params['currency'])) {
-           throw new \Exception('Currency is null');
+            throw new \Exception('Currency is null');
         }
         if (!in_array($params['currency'], $this->_supportedCurrencies)) {
             throw new \Exception('Currency is not supported');
@@ -275,21 +283,17 @@ class Liqpay extends AbstractProvider
             $inputs[] = sprintf('<input type="hidden" name="%s" value="%s" />', $key, $value);
         }
 
-        return sprintf('
+        return sprintf(
+                '
                 <form method="post" action="https://www.liqpay.com/api/pay" accept-charset="utf-8">
                     %s
                     <input type="image" src="//static.liqpay.com/buttons/p1%s.radius.png" name="btn_text" />
                 </form>
             ',
-            join("\r\n", $inputs),
-            $language
+                join("\r\n", $inputs),
+                $language
         );
     }
-
-
-
-
-
 
 
     /**
@@ -301,6 +305,7 @@ class Liqpay extends AbstractProvider
      */
     public function _signature($params)
     {
+
         $public_key = $params['public_key'] = $this->credentials['public_key'];
         $private_key = $this->credentials['private_key'];
 
@@ -315,34 +320,34 @@ class Liqpay extends AbstractProvider
 
         $order_id = '';
         if (isset($params['order_id'])) {
-           $order_id = $params['order_id'];
+            $order_id = $params['order_id'];
         }
 
         $type = '';
         if (isset($params['type'])) {
-           $type = $params['type'];
+            $type = $params['type'];
         }
 
         $result_url = '';
         if (isset($params['result_url'])) {
-           $result_url = $params['result_url'];
+            $result_url = $params['result_url'];
         }
 
         $server_url = '';
         if (isset($params['server_url'])) {
-           $server_url = $params['server_url'];
+            $server_url = $params['server_url'];
         }
 
         $signature = $this->_strToSign(
-            $private_key.
-            $amount.
-            $currency.
-            $public_key.
-            $order_id.
-            $type.
-            $description.
-            $result_url.
-            $server_url
+                $private_key .
+                $amount .
+                $currency .
+                $public_key .
+                $order_id .
+                $type .
+                $description .
+                $result_url .
+                $server_url
         );
 
         return $signature;
@@ -359,11 +364,8 @@ class Liqpay extends AbstractProvider
     private function _strToSign($str)
     {
 
-        $signature = base64_encode(sha1($str,1));
-
-        return $signature;
+        return base64_encode(sha1($str, 1));
     }
-
 
 
 }
