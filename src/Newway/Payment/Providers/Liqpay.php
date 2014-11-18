@@ -241,6 +241,10 @@ class Liqpay extends AbstractProvider
      */
     private function _getForm($params)
     {
+
+        $public_key = $params['public_key'] = $this->credentials['public_key'];
+        $private_key = $this->credentials['private_key'];
+
         if (!isset($params['amount'])) {
             throw new \Exception('Amount is null');
         }
