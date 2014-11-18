@@ -37,10 +37,7 @@ class Liqpay extends AbstractProvider
                 'private_key' => 'required|min:5',
         );
 
-        prd($credentials);
         $this->validator->validate($credentials, $rules);
-
-
     }
 
 
