@@ -1,0 +1,22 @@
+{
+    "name": "newway/payment",
+    "description": "Payment package for laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "YAAP",
+            "email": "yaapis@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "liqpay/liqpay": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Newway\\Payment": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
