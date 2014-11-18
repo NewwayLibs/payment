@@ -1,6 +1,6 @@
 <?php namespace Newway\Payment\Validation;
 
-use Illuminate\Validation\Factory as Validator;
+use Illuminate\Validation\Factory as IlluminateValidator;
 
 class LaravelValidator implements FactoryInterface {
 
@@ -10,9 +10,9 @@ class LaravelValidator implements FactoryInterface {
 	private $validator;
 
 	/**
-	 * @param Validator $validator
+	 * @param IlluminateValidator $validator
 	 */
-	function __construct(Validator $validator)
+	function __construct(IlluminateValidator $validator)
 	{
 		$this->validator = $validator;
 	}
