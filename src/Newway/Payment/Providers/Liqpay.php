@@ -54,10 +54,11 @@ class Liqpay extends AbstractProvider
 
     /**
      * @param array $credentials
+     * @param null $desciption
      * @throws ValidationException
      * @return string
      */
-    public function getForm(array $credentials)
+    public function getForm(array $credentials, $desciption = null)
     {
 
 
@@ -79,7 +80,7 @@ class Liqpay extends AbstractProvider
         $this->validator->validate($credentials, $rules);
 
 
-        return $this->_getForm($credentials);
+        return $this->_getForm($credentials, $desciption);
     }
 
     /**
@@ -250,10 +251,11 @@ class Liqpay extends AbstractProvider
      *
      * @param array $params
      *
+     * @param null $desciption
      * @throws ValidationException
      * @return string
      */
-    private function _getForm($params)
+    private function _getForm($params, $desciption = null)
     {
 
         $public_key = $params['public_key'] = $this->credentials['public_key'];
@@ -299,6 +301,11 @@ class Liqpay extends AbstractProvider
         }
 
         $inputs = array();
+
+        if (!empty($desciption)){
+            $inputs [] = $desciption;
+        }
+
         foreach ($params as $key => $value) {
             if (!in_array($key, $this->_supportedParams)) {
                 continue;

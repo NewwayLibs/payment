@@ -17,10 +17,10 @@ interface ProviderInterface
 
     /**
      * @param array $credentials
-     * @throws ValidationException
+     * @param null $desciption
      * @return string
      */
-    public function getForm(array $credentials);
+    public function getForm(array $credentials, $desciption = null);
 
     /**
      * Сохраняем данные транзакции в объект
