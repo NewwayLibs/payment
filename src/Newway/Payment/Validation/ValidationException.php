@@ -1,35 +1,46 @@
 <?php namespace Newway\Payment\Validation;
 
+use Illuminate\Support\MessageBag;
+
 /**
  * Class ValidationException
  * @package Newway\Payment\Validation
  */
-class ValidationException extends \Exception {
+class ValidationException extends \Exception
+{
 
-	/**
-	 * @var mixed
-	 */
-	protected $errors;
+    /**
+     * @var mixed
+     */
+    protected $errors;
 
-	/**
-	 * @param string $message
-	 * @param mixed  $errors
-	 */
-	function __construct($message, $errors)
-	{
-		$this->errors = $errors;
+    /**
+     * @param string $message
+     * @param array | MessageBag  $errors
+     */
+    function __construct($message, $errors)
+    {
 
-		parent::__construct($message);
-	}
+        if (!$errors instanceof MessageBag) {
 
-	/**
-	 * Get form validation errors
-	 *
-	 * @return mixed
-	 */
-	public function getErrors()
-	{
-		return $this->errors;
-	}
+            $errors = new MessageBag((array)$errors);
+        }
+
+
+        $this->errors = $errors;
+
+        parent::__construct($message);
+    }
+
+    /**
+     * Get form validation errors
+     *
+     * @return MessageBag
+     */
+    public function getErrors()
+    {
+
+        return $this->errors;
+    }
 
 }
