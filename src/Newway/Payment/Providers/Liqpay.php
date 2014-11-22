@@ -1,5 +1,6 @@
 <?php namespace Newway\Payment\Providers;
 
+use Illuminate\Support\Facades\Lang;
 use Newway\Payment\Exceptions\HackException;
 use Newway\Payment\Exceptions\ProviderException;
 use Newway\Payment\Validation\ValidationException;
@@ -150,7 +151,8 @@ class Liqpay extends AbstractProvider
         // проверяем подпись
         if ($sign != $this->signature) {
             throw new HackException(
-                    trans('payments.hack_attempt') . ': ' . trans('payments.invalid_signature') . '(' . $sign . ')'
+                    Lang::get('payment::messages.hack_attempt') . ': ' .
+                    Lang::get('payment::messages.invalid_signature')
             );
         }
 
@@ -167,7 +169,10 @@ class Liqpay extends AbstractProvider
 
         // проверяем подпись
         if ($amount != $this->amount) {
-            throw new HackException(trans('payments.hack_attempt') . ': ' . trans('payments.invalid_amount'));
+            throw new HackException(
+                    Lang::get('payment::messages.hack_attempt') . ': ' .
+                    Lang::get('payment::messages.invalid_amount')
+            );
         }
 
     }
@@ -183,7 +188,10 @@ class Liqpay extends AbstractProvider
 
         // проверяем подпись
         if ($currency != $this->currency) {
-            throw new HackException(trans('payments.hack_attempt') . ': ' . trans('payments.invalid_currency'));
+            throw new HackException(
+                    Lang::get('payment::messages.hack_attempt') . ': ' .
+                    Lang::get('payment::messages.invalid_currency')
+            );
         }
 
     }
@@ -242,7 +250,7 @@ class Liqpay extends AbstractProvider
      *
      * @param array $params
      *
-     * @throws \Exception
+     * @throws ValidationException
      * @return string
      */
     private function _getForm($params)
@@ -252,19 +260,34 @@ class Liqpay extends AbstractProvider
         $private_key = $this->credentials['private_key'];
 
         if (!isset($params['amount'])) {
-            throw new \Exception('Amount is null');
+            throw new ValidationException(
+                    Lang::get('payment::messages.required_fields_not_provided'),
+                    ['amount' => Lang::get('payment::messages.amount_is_null')]
+            );
         }
         if (!isset($params['currency'])) {
-            throw new \Exception('Currency is null');
+            throw new ValidationException(
+                    Lang::get('payment::messages.required_fields_not_provided'),
+                    ['currency' => Lang::get('payment::messages.currency_is_null')]
+            );
+
         }
         if (!in_array($params['currency'], $this->_supportedCurrencies)) {
-            throw new \Exception('Currency is not supported');
+            throw new ValidationException(
+                    Lang::get('payment::messages.required_fields_not_provided'),
+                    ['currency' => Lang::get('payment::messages.currency_is_not_supported')]
+            );
+
         }
         if ($params['currency'] == 'RUR') {
             $params['currency'] = 'RUB';
         }
         if (!isset($params['description'])) {
-            throw new \Exception('Description is null');
+            throw new ValidationException(
+                    Lang::get('payment::messages.required_fields_not_provided'),
+                    ['description' => Lang::get('payment::messages.description_is_null')]
+            );
+
         }
 
         $params['signature'] = $this->_signature($params);

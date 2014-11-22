@@ -1,5 +1,6 @@
 <?php namespace Newway\Payment;
 
+use Illuminate\Support\Facades\Lang;
 use Newway\Payment\Exceptions\ProviderException;
 use Newway\Payment\Interfaces\ProviderInterface;
 use Newway\Payment\Providers\Liqpay;
@@ -9,7 +10,8 @@ use Newway\Payment\Validation\ValidationException;
  * Class Factory
  * @package Newway\Payment
  */
-class Factory {
+class Factory
+{
 
     /**
      * @param $provider
@@ -17,16 +19,19 @@ class Factory {
      * @throws ProviderException | ValidationException
      * @return ProviderInterface
      */
-    public static function make($provider, array $credentials = array()){
+    public static function make($provider, array $credentials = array())
+    {
 
 
-        switch ($provider){
+        switch ($provider) {
             case 'liqpay':
                 return new Liqpay($credentials);
                 break;
             default:
                 // there is no such provider
-                throw new ProviderException('Cannot find provider: '.$provider);
+                throw new ProviderException(
+                        Lang::get('payment::messages.provider_not_found') . ': ' . $provider
+                );
         }
 
 
