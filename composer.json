@@ -1,6 +1,6 @@
 {
     "name": "newway/payment",
-    "description": "Payment package for laravel",
+    "description": "Payment package for laravel 4",
     "license": "MIT",
     "authors": [
         {
