@@ -2,6 +2,10 @@
 
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Class PaymentServiceProvider
+ * @package Newway\Payment
+ */
 class PaymentServiceProvider extends ServiceProvider {
 
 	/**
@@ -18,7 +22,7 @@ class PaymentServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('newway/payment');
+
 	}
 
 	/**
@@ -28,6 +32,7 @@ class PaymentServiceProvider extends ServiceProvider {
 	 */
     public function register()
     {
+
         $this->app->bind(
             'Newway\Payment\Validation\FactoryInterface',
             'Newway\Payment\Validation\LaravelValidator'
