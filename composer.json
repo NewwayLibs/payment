@@ -13,8 +13,8 @@
         "illuminate/support": "5.*"
     },
     "autoload": {
-        "psr-4": {
-          "Newway\\Payment\\": "src/"
+        "psr-0": {
+          "Newway\\Payment": "src/"
         }
     },
     "minimum-stability": "stable"
