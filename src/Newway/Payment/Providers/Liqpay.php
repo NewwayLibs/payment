@@ -24,6 +24,9 @@ class Liqpay extends AbstractProvider
             'type',
             'signature',
             'language',
+            'subscribe',
+            'subscribe_date_start',
+            'subscribe_periodicity',
             'sandbox'
     );
 
@@ -67,9 +70,10 @@ class Liqpay extends AbstractProvider
                 'currency'              => 'required|in:USD,EUR,RUB,UAH,GEL',
                 'description'           => 'required',
                 'order_id'              => 'required',
-                'type'                  => 'in:buy,donate,subscribe',
-                'subscribe_date_start'  => 'required_if:type,subscribe|date|date_format:Y-m-d H:i:s',
-                'subscribe_periodicity' => 'required_if:type,subscribe|in:month,year',
+                'type'                  => 'in:buy,donate',
+                'subscribe'             => 'in:1',
+                'subscribe_date_start'  => 'required_if:subscribe,1|date|date_format:Y-m-d H:i:s',
+                'subscribe_periodicity' => 'required_if:subscribe,1|in:month,year',
                 'server_url'            => 'url',
                 'result_url'            => 'url',
                 'pay_way'               => 'in:card,delayed',
@@ -399,3 +403,4 @@ class Liqpay extends AbstractProvider
 
 
 }
+
