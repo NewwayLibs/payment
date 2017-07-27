@@ -226,7 +226,7 @@ class Liqpay extends AbstractProvider
     public function api($url, $params = array())
     {
 
-        $url = 'https://www.liqpay.com/api/' . $url;
+        $url = 'https://www.liqpay.ua/api/' . $url;
 
         $public_key = $this->credentials['public_key'];
         $private_key = $this->credentials['private_key'];
@@ -319,9 +319,9 @@ class Liqpay extends AbstractProvider
 
         return sprintf(
                 '
-                <form method="post" action="https://www.liqpay.com/api/pay" accept-charset="utf-8">
+                <form method="post" action="https://www.liqpay.ua/api/pay" accept-charset="utf-8">
                     %s
-                    <input type="image" src="//static.liqpay.com/buttons/p1%s.radius.png" name="btn_text" />
+                    <input type="image" src="//static.liqpay.ua/buttons/p1%s.radius.png" name="btn_text" />
                 </form>
             ',
                 join("\r\n", $inputs),
