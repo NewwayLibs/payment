@@ -75,4 +75,12 @@ interface ProviderInterface
      * @return mixed
      */
     public function __get($field);
+
+    /**
+     *
+     * Формирование ответа для платежной системы
+     *
+     * @return array
+     */
+    public function getResponse();
 }
