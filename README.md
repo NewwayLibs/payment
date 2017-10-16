@@ -1,2 +1,2 @@
-# Payment package for Laravel 4
+# Payment package for Laravel 5
 

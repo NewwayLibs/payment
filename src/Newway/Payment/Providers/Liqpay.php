@@ -214,6 +214,17 @@ class Liqpay extends AbstractProvider
         return array_get($this->data, $field);
     }
 
+    /**
+     *
+     * Формирование ответа для платежной системы
+     *
+     * @return array
+     */
+    public function getResponse()
+    {
+        return [];
+    }
+
 
     /**
      * Call API

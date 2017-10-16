@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Lang;
 use Newway\Payment\Exceptions\ProviderException;
 use Newway\Payment\Interfaces\ProviderInterface;
 use Newway\Payment\Providers\Liqpay;
+use Newway\Payment\Providers\Wayforpay;
 use Newway\Payment\Validation\ValidationException;
 
 /**
@@ -26,6 +27,9 @@ class Factory
         switch ($provider) {
             case 'liqpay':
                 return new Liqpay($credentials);
+                break;
+            case 'wayforpay':
+                return new Wayforpay($credentials);
                 break;
             default:
                 // there is no such provider
