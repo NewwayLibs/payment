@@ -38,10 +38,10 @@ interface ProviderInterface
 
     /**
      * Получение подписи транзакции по данным
-     *
+     * @param null $params
      * @return string
      */
-    public function getSign();
+    public function getSign($params = null);
 
     /**
      *
