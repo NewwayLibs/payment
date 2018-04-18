@@ -16,11 +16,11 @@ interface ProviderInterface
 
 
     /**
-     * @param array $credentials
-     * @param null $desciption
+     * @param array $params
+     *
      * @return string
      */
-    public function getForm(array $credentials, $desciption = null);
+    public function getForm(array $params);
 
     /**
      * Сохраняем данные транзакции в объект
@@ -39,17 +39,12 @@ interface ProviderInterface
     /**
      * Получение подписи транзакции по данным
      *
+     * @param array $params
+     *
      * @return string
      */
-    public function getSign();
+    public function getSign(array $params);
 
-    /**
-     *
-     * Проверяем подпись запроса
-     * @throws HackException
-     *
-     */
-    public function validateSignature();
 
     /**
      *
@@ -75,12 +70,4 @@ interface ProviderInterface
      * @return mixed
      */
     public function __get($field);
-
-    /**
-     *
-     * Формирование ответа для платежной системы
-     *
-     * @return array
-     */
-    public function getResponse();
 }
